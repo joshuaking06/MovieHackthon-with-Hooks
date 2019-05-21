@@ -26,7 +26,6 @@ class App extends React.Component {
 		this.handleChange = this.handleChange.bind(this)
 		this.getMovie = this.getMovie.bind(this)
 		this.getRelatedMovies = this.getRelatedMovies.bind(this)
-		this.getId = this.getId.bind(this)
 	}
 
 	handleChange(e) {
@@ -61,14 +60,6 @@ class App extends React.Component {
 				})
 				this.makeRecommendedRequest(res.data.id)
 			})
-	}
-
-	getId(id) {
-		axios
-			.get(
-				`https://api.themoviedb.org/3/movie/${id}?api_key=adfdea606b119c5d76189ff434738475`
-			)
-			.then((res) => this.getMovie(res.data.imdb_id))
 	}
 
 	getRelatedMovies(id) {
@@ -115,7 +106,7 @@ class App extends React.Component {
 						{this.state.relatedMovies && (
 							<RecommendedMovies
 								movies={this.state.relatedMovies}
-								getId={this.getId}
+								getMovie={this.getMovie}
 							/>
 						)}
 					</div>
