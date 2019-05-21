@@ -30,7 +30,8 @@ const App = (props) => {
 	const getSearchResults = () => {
 		axios
 			.get(
-				`https://api.themoviedb.org/3/search/movie?api_key=adfdea606b119c5d76189ff434738475&language=en-US&query=${searchText}&page=1&include_adult=false`
+				`https://api.themoviedb.org/3/search/movie?api_key=${process.env
+					.API_KEY}&language=en-US&query=${searchText}&page=1&include_adult=false`
 			)
 			.then((res) => {
 				setSearchResults(res.data.results)
@@ -43,8 +44,8 @@ const App = (props) => {
 		setSearchResults([])
 		axios
 			.get(
-				`https://api.themoviedb.org/3/movie/${e.currentTarget
-					.id}?api_key=adfdea606b119c5d76189ff434738475&language=en-US`
+				`https://api.themoviedb.org/3/movie/${e.currentTarget.id}?api_key=${process.env
+					.API_KEY}&language=en-US`
 			)
 			.then((res) => {
 				setMoviesWatched([ ...moviesWatched, res.data ])
@@ -55,7 +56,8 @@ const App = (props) => {
 	const makeRecommendedRequest = (id) => {
 		axios
 			.get(
-				`https://api.themoviedb.org/3/movie/${id}/recommendations?api_key=adfdea606b119c5d76189ff434738475`
+				`https://api.themoviedb.org/3/movie/${id}/recommendations?api_key=${process.env
+					.API_KEY}`
 			)
 			.then((res) => setRelatedMovies(res.data.results))
 	}
