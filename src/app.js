@@ -41,27 +41,26 @@ class App extends React.Component {
 						.state.searchText}&page=1&include_adult=false`
 				)
 				.then((res) => {
-					console.log(res.data.results)
 					this.setState({ possibleResults: res.data.results })
 				})
 				.catch((err) => console.log(err))
 		}
 	}
 
-	getMovie(imdb, e) {
-		let imdbID
-		if (e) imdbID = e.currentTarget.id
-		if (imdb) imdbID = imdb
+	getMovie(e) {
 		this.setState({ searchText: '', possibleResults: [] })
-		axios.get(`${baseUrl}?i=${imdbID}${apiKey}`).then((res) => {
-			this.setState({
-				timeWatched: this.state.timeWatched + parseFloat(res.data.Runtime),
-				moviesWatched: [ res.data, ...this.state.moviesWatched ]
+		axios
+			.get(
+				`https://api.themoviedb.org/3/movie/${e.currentTarget
+					.id}?api_key=adfdea606b119c5d76189ff434738475&language=en-US`
+			)
+			.then((res) => {
+				console.log(res)
+				this.setState({
+					moviesWatched: [ res.data, ...this.state.moviesWatched ]
+				})
+				this.makeRecommendedRequest(res.data.id)
 			})
-		})
-		const movieName = e.currentTarget.firstElementChild.innerHTML.replace(' ', '')
-		console.log(movieName)
-		this.getRelatedMovies(imdbID)
 	}
 
 	getId(id) {
