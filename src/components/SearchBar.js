@@ -22,7 +22,9 @@ const SearchBar = ({ searchText, handleChange, possibleResults, getMovie }) => {
 									id={possibleResult.id}
 								>
 									<span>{possibleResult.title}</span>
-									{/* <img src={possibleResult.Poster}/> */}
+									<img
+										src={`http://image.tmdb.org/t/p/w185/${possibleResult.poster_path}`}
+									/>
 								</div>
 							)
 					)}
