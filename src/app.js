@@ -14,36 +14,37 @@ import MovieCard from './components/MovieCard'
 import SearchBar from './components/SearchBar.js'
 import RecommendedMovies from './components/RecommendedMovies.js'
 
-const [ searchText, setSearchText ] = useState('')
-const [ moviesWatched, setMoviesWatched ] = useState([])
-const [ possibleResults, setPossibleResults ] = useState([])
-const [ relatedMovies, setRelatedMovies ] = useState([])
-
 const App = (props) => {
 	const [ searchText, setSearchText ] = useState('')
 	const [ moviesWatched, setMoviesWatched ] = useState([])
-	const [ possibleResults, setPossibleResults ] = useState([])
+	const [ searchResults, setSearchResults ] = useState([])
 	const [ relatedMovies, setRelatedMovies ] = useState([])
 
 	const handleChange = (e) => {
-		this.setState({ searchText: e.target.value }, () => getSearchResults())
+		setSearchText(e.target.value)
 	}
 
+	useEffect(
+		() => {
+			if (searchText.length > 2) getSearchResults()
+			if (searchText.length < 3) setSearchResults([])
+		},
+		[ searchText ]
+	)
+
 	const getSearchResults = () => {
-		if (searchText.length > 1) {
-			axios
-				.get(
-					`https://api.themoviedb.org/3/search/movie?api_key=adfdea606b119c5d76189ff434738475&language=en-US&query=${searchText}&page=1&include_adult=false`
-				)
-				.then((res) => {
-					this.setState({ possibleResults: res.data.results })
-				})
-				.catch((err) => console.log(err))
-		}
+		axios
+			.get(
+				`https://api.themoviedb.org/3/search/movie?api_key=adfdea606b119c5d76189ff434738475&language=en-US&query=${searchText}&page=1&include_adult=false`
+			)
+			.then((res) => {
+				setSearchResults(res.data.results)
+			})
+			.catch((err) => console.log(err))
 	}
 
 	const getMovie = (e) => {
-		this.setState({ searchText: '', possibleResults: [] })
+		this.setState({ searchText: '', searchResults: [] })
 		axios
 			.get(
 				`https://api.themoviedb.org/3/movie/${e.currentTarget
@@ -76,7 +77,7 @@ const App = (props) => {
 								getMovie={getMovie}
 								handleChange={handleChange}
 								searchText={searchText}
-								possibleResults={possibleResults}
+								possibleResults={searchResults}
 							/>
 						</div>
 					</div>
