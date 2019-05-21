@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import ReactDOM from 'react-dom'
 
 import axios from 'axios'
@@ -14,30 +14,26 @@ import MovieCard from './components/MovieCard'
 import SearchBar from './components/SearchBar.js'
 import RecommendedMovies from './components/RecommendedMovies.js'
 
-class App extends React.Component {
-	constructor() {
-		super()
+const [ searchText, setSearchText ] = useState('')
+const [ moviesWatched, setMoviesWatched ] = useState([])
+const [ possibleResults, setPossibleResults ] = useState([])
+const [ relatedMovies, setRelatedMovies ] = useState([])
 
-		this.state = {
-			searchText: '',
-			timeWatched: 0,
-			moviesWatched: []
-		}
-		this.handleChange = this.handleChange.bind(this)
-		this.getMovie = this.getMovie.bind(this)
-		this.getRelatedMovies = this.getRelatedMovies.bind(this)
+const App = (props) => {
+	const [ searchText, setSearchText ] = useState('')
+	const [ moviesWatched, setMoviesWatched ] = useState([])
+	const [ possibleResults, setPossibleResults ] = useState([])
+	const [ relatedMovies, setRelatedMovies ] = useState([])
+
+	const handleChange = (e) => {
+		this.setState({ searchText: e.target.value }, () => getSearchResults())
 	}
 
-	handleChange(e) {
-		this.setState({ searchText: e.target.value }, () => this.getSearchResults())
-	}
-
-	getSearchResults() {
-		if (this.state.searchText.length > 1) {
+	const getSearchResults = () => {
+		if (searchText.length > 1) {
 			axios
 				.get(
-					`https://api.themoviedb.org/3/search/movie?api_key=adfdea606b119c5d76189ff434738475&language=en-US&query=${this
-						.state.searchText}&page=1&include_adult=false`
+					`https://api.themoviedb.org/3/search/movie?api_key=adfdea606b119c5d76189ff434738475&language=en-US&query=${searchText}&page=1&include_adult=false`
 				)
 				.then((res) => {
 					this.setState({ possibleResults: res.data.results })
@@ -46,7 +42,7 @@ class App extends React.Component {
 		}
 	}
 
-	getMovie(e) {
+	const getMovie = (e) => {
 		this.setState({ searchText: '', possibleResults: [] })
 		axios
 			.get(
@@ -56,21 +52,13 @@ class App extends React.Component {
 			.then((res) => {
 				console.log(res)
 				this.setState({
-					moviesWatched: [ res.data, ...this.state.moviesWatched ]
+					moviesWatched: [ res.data, moviesWatched ]
 				})
-				this.makeRecommendedRequest(res.data.id)
+				makeRecommendedRequest(res.data.id)
 			})
 	}
 
-	getRelatedMovies(id) {
-		axios
-			.get(
-				`https://api.themoviedb.org/3/find/${id}?api_key=adfdea606b119c5d76189ff434738475&external_source=imdb_id`
-			)
-			.then((res) => this.makeRecommendedRequest(res.data.movie_results[0].id))
-	}
-
-	makeRecommendedRequest(id) {
+	const makeRecommendedRequest = (id) => {
 		axios
 			.get(
 				`https://api.themoviedb.org/3/movie/${id}/recommendations?api_key=adfdea606b119c5d76189ff434738475`
@@ -78,42 +66,36 @@ class App extends React.Component {
 			.then((res) => this.setState({ relatedMovies: res.data.results }))
 	}
 
-	render() {
-		return (
-			<main>
-				<section className="section">
-					<div className="container">
-						<div className="columns is-centered">
-							<div className="column is-8">
-								<DisplayTime timeWatched={this.state.timeWatched} />
-								<SearchBar
-									getMovie={this.getMovie}
-									handleChange={this.handleChange}
-									searchText={this.state.searchText}
-									possibleResults={this.state.possibleResults}
-								/>
-							</div>
+	return (
+		<main>
+			<section className="section">
+				<div className="container">
+					<div className="columns is-centered">
+						<div className="column is-8">
+							<SearchBar
+								getMovie={getMovie}
+								handleChange={handleChange}
+								searchText={searchText}
+								possibleResults={possibleResults}
+							/>
 						</div>
 					</div>
-				</section>
+				</div>
+			</section>
 
-				<section className="columns section">
-					<div className="column is-9 middle-part">
-						<DisplayMoviesWatched movies={this.state.moviesWatched} />
-					</div>
+			<section className="columns section">
+				<div className="column is-9 middle-part">
+					<DisplayMoviesWatched movies={moviesWatched} />
+				</div>
 
-					<div className="column is-3 side-part">
-						{this.state.relatedMovies && (
-							<RecommendedMovies
-								movies={this.state.relatedMovies}
-								getMovie={this.getMovie}
-							/>
-						)}
-					</div>
-				</section>
-			</main>
-		)
-	}
+				<div className="column is-3 side-part">
+					{relatedMovies.length > 1 && (
+						<RecommendedMovies movies={relatedMovies} getMovie={this.getMovie} />
+					)}
+				</div>
+			</section>
+		</main>
+	)
 }
 
 ReactDOM.render(<App />, document.getElementById('root'))
