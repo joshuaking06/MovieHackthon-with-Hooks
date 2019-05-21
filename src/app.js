@@ -5,12 +5,7 @@ import axios from 'axios'
 import 'bulma'
 import './style.scss'
 
-const apiKey = '&apikey=6116c432'
-const baseUrl = 'https://www.omdbapi.com/'
-
-import DisplayTime from './components/DisplayTime'
 import DisplayMoviesWatched from './components/DisplayMoviesWatched'
-import MovieCard from './components/MovieCard'
 import SearchBar from './components/SearchBar.js'
 import RecommendedMovies from './components/RecommendedMovies.js'
 
@@ -44,17 +39,15 @@ const App = (props) => {
 	}
 
 	const getMovie = (e) => {
-		this.setState({ searchText: '', searchResults: [] })
+		setSearchText('')
+		setSearchResults([])
 		axios
 			.get(
 				`https://api.themoviedb.org/3/movie/${e.currentTarget
 					.id}?api_key=adfdea606b119c5d76189ff434738475&language=en-US`
 			)
 			.then((res) => {
-				console.log(res)
-				this.setState({
-					moviesWatched: [ res.data, moviesWatched ]
-				})
+				setMoviesWatched([ ...moviesWatched, res.data ])
 				makeRecommendedRequest(res.data.id)
 			})
 	}
@@ -64,7 +57,7 @@ const App = (props) => {
 			.get(
 				`https://api.themoviedb.org/3/movie/${id}/recommendations?api_key=adfdea606b119c5d76189ff434738475`
 			)
-			.then((res) => this.setState({ relatedMovies: res.data.results }))
+			.then((res) => setRelatedMovies(res.data.results))
 	}
 
 	return (
@@ -91,7 +84,7 @@ const App = (props) => {
 
 				<div className="column is-3 side-part">
 					{relatedMovies.length > 1 && (
-						<RecommendedMovies movies={relatedMovies} getMovie={this.getMovie} />
+						<RecommendedMovies movies={relatedMovies} getMovie={getMovie} />
 					)}
 				</div>
 			</section>
